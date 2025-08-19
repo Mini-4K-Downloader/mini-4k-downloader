@@ -2,7 +2,7 @@
   "name": "mini-4k-downloader",
   "version": "1.0.0",
   "description": "A simple Electron video downloader with yt-dlp",
-  "main": "main.js",
+  "main": "src/main/main.js",
   "scripts": {
     "start": "electron .",
     "dist": "electron-builder"
