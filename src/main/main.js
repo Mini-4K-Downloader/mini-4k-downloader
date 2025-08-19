@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const { exec } = require('child_process')
+const isDev = !app.isPackaged;
 
 let mainWindow
 
@@ -14,10 +15,9 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true
     }
-  })
+})
 
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
-
   // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
@@ -36,10 +36,27 @@ app.on('activate', function () {
 })
 
 ipcMain.handle('download-video', async (event, { url, format }) => {
-  const savePath = dialog.showOpenDialogSync({ properties: ['openDirectory'] })
-  if (!savePath) return '❌ Canceled'
+  const savePaths = dialog.showOpenDialogSync({ properties: ['openDirectory'] });
+  if (!savePaths || savePaths.length === 0) return '❌ Canceled';
+  const savePath = savePaths[0];
 
-  let cmd = `yt-dlp -o "${savePath}/%(title)s.%(ext)s"`
+  let ytdlpPath;
+  if (process.platform === 'win32') {
+    ytdlpPath = isDev 
+      ? path.join(__dirname, '../../bin/yt-dlp.exe')
+      : path.join(process.resourcesPath, 'bin/yt-dlp.exe');
+  } else if (process.platform === 'darwin') {
+    ytdlpPath = isDev
+      ? path.join(__dirname, '../../bin/yt-dlp_macos')
+      : path.join(process.resourcesPath, 'bin/yt-dlp_macos');
+  } else {
+    ytdlpPath = isDev
+      ? path.join(__dirname, '../../bin/yt-dlp_linux')
+      : path.join(process.resourcesPath, 'bin/yt-dlp_linux');
+  }
+
+
+  let cmd = `"${ytdlpPath}" -o "${savePath}/%(title)s.%(ext)s"`
 
   if (format === 'mp3') {
     cmd += ` --extract-audio --audio-format mp3`
@@ -49,7 +66,7 @@ ipcMain.handle('download-video', async (event, { url, format }) => {
     cmd += ` -f webm`
   }
 
-  cmd += ` ${url}`
+  cmd += ` "${url}"`
 
   return new Promise((resolve, reject) => {
     exec(cmd, (error, stdout, stderr) => {

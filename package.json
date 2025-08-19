@@ -18,10 +18,13 @@
     },
     "linux": {
       "target": "AppImage"
-    }
-  },
-  "devDependencies": {
-    "electron": "^30.0.0",
-    "electron-builder": "^25.0.0"
+    },
+    "extraResources": [
+      {
+        "from": "bin/",
+        "to": "bin/",
+        "filter": ["**/*"]
+      }
+    ]
   }
 }
