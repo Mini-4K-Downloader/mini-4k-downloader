@@ -1,0 +1,27 @@
+{
+  "name": "mini-4k-downloader",
+  "version": "1.0.0",
+  "description": "A simple Electron video downloader with yt-dlp",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.yourname.mini4kdownloader",
+    "productName": "Mini 4K Downloader",
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^25.0.0"
+  }
+}

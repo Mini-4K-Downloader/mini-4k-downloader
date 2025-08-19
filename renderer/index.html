@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mini 4K Downloader</title>
+</head>
+
+<body>
+    <h1>🎥 Video Downloader</h1>
+    <input type="text" id="url" placeholder="Paste video URL here" size="50" />
+
+    <label for="format">Format:</label>
+    <select id="format">
+        <option value="mp4">MP4 (Video)</option>
+        <option value="mp3">MP3 (Audio)</option>
+        <option value="webm">WEBM (Video)</option>
+    </select>
+
+    <button id="download">Download</button>
+    <pre id="log"></pre>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>
