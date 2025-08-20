@@ -8,7 +8,8 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.yourname.mini4kdownloader",
+    "asar": true,
+    "appId": "com.shouko.mini4kdownloader",
     "productName": "Mini 4K Downloader",
     "mac": {
       "target": "dmg"
