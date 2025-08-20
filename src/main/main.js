@@ -2,6 +2,10 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 const isDev = !app.isPackaged
+const { getFormatArgs } = require('../scripts/format')
+const { getQualityArgs } = require('../scripts/quality')
+
+// const {
 
 let mainWindow
 
@@ -31,11 +35,12 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
+
 app.on('activate', function () {
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
-ipcMain.handle('download-video', async (event, { url, format }) => {
+ipcMain.handle('download-video', async (event, { url, format, quality }) => {
   const savePaths = dialog.showOpenDialogSync({ properties: ['openDirectory'] })
   if (!savePaths || savePaths.length === 0) return '❌ Canceled'
   const savePath = savePaths[0]
@@ -55,11 +60,14 @@ ipcMain.handle('download-video', async (event, { url, format }) => {
       : path.join(process.resourcesPath, 'bin/yt-dlp_linux')
   }
 
-  const args = ['-o', `${savePath}/%(title)s.%(ext)s`]
-  if (format === 'mp3') args.push('--extract-audio', '--audio-format', 'mp3')
-  else if (format === 'mp4') args.push('-f', 'mp4')
-  else if (format === 'webm') args.push('-f', 'webm')
-  args.push(url)
+  const args = ['--newline', '-o', `${savePath}/%(title)s.%(ext)s`]
+
+  args.push(...getFormatArgs(format));
+  args.push(...getQualityArgs(quality));
+
+  args.push(url);
+
+    console.log('Yt-dlp args:', args);
 
   return new Promise((resolve, reject) => {
     const proc = spawn(ytdlpPath, args)

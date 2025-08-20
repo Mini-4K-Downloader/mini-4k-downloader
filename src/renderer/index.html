@@ -1,43 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Mini 4K Downloader</title>
-  <style>
-    #progress-container {
-      width: 100%;
-      background: #eee;
-      height: 20px;
-      border-radius: 10px;
-      margin: 10px 0;
-    }
-    #progress-bar {
-      height: 100%;
-      width: 0%;
-      background: green;
-      border-radius: 10px;
-      transition: width 0.2s;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Mini 4K Downloader</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🎥 Video Downloader</h1>
-  <input type="text" id="url" placeholder="Paste video URL here" size="50" />
+<div class="container">
+    <h1>🎥 Mini 4K Downloader</h1>
 
-  <label for="format">Format:</label>
-  <select id="format">
-      <option value="mp4">MP4 (Video)</option>
-      <option value="mp3">MP3 (Audio)</option>
-      <option value="webm">WEBM (Video)</option>
-  </select>
+    <input type="text" id="url" placeholder="Paste video URL here" />
 
-  <button id="download">Download</button>
+    <div class="controls">
+        <div class="control-group">
+            <label for="format">Format:</label>
+            <select id="format">
+                <option value="mp4">MP4 (Video)</option>
+                <option value="mkv">MKV (Video)</option>
+                <option value="mp3">MP3 (Audio)</option>
+            </select>
+        </div>
 
-  <div id="progress-container">
-    <div id="progress-bar"></div>
-  </div>
-  <pre id="log"></pre>
+        <div class="control-group">
+            <label for="quality">Quality:</label>
+            <select id="quality">
+                <option value="auto">Auto</option>
+                <option value="720p">720p</option>
+                <option value="1080p">1080p</option>
+                <option value="1440p">1440p (2K)</option>
+                <option value="2160p">2160p (4K)</option>
+            </select>
+        </div>
 
-  <script src="renderer.js"></script>
+        <button id="download">Download</button>
+    </div>
+
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <pre id="log"></pre>
+</div>
+
+<script src="renderer.js"></script>
 </body>
 </html>
