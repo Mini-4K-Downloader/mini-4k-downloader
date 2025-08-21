@@ -61,8 +61,8 @@ ipcMain.handle('download-video', async (event, { url, format, quality }) => {
     let ffmpegPath
     if (process.platform === 'win32') {
         ffmpegPath = isDev
-            ? path.join(__dirname, '../../bin/ffmpeg.exe')
-            : path.join(process.resourcesPath, 'bin/ffmpeg.exe')
+            ? path.join(__dirname, '../../bin/ffmpeg_win.exe')
+            : path.join(process.resourcesPath, 'bin/ffmpeg_win.exe')
     } else if (process.platform === 'darwin') {
         ffmpegPath = isDev
             ? path.join(__dirname, '../../bin/ffmpeg_macos')
