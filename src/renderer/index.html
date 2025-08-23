@@ -1,45 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini 4K Downloader</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-    <h1>🎥 Mini 4K Downloader</h1>
 
-    <input type="text" id="url" placeholder="Paste video URL here" />
+<div class="controls">
+    <input type="text" id="videoURL" placeholder="Paste video URL here.." />
+    <button id="addLinkBtn">Add Link</button>
 
-    <div class="controls">
-        <div class="control-group">
-            <label for="format">Format:</label>
-            <select id="format">
-                <option value="mp4">MP4 (Video)</option>
-                <option value="mkv">MKV (Video)</option>
-                <option value="mp3">MP3 (Audio)</option>
-            </select>
-        </div>
+    <select class="dropdown" id="type">
+        <option>Video</option>
+        <option>Audio</option>
+    </select>
+    <select class="dropdown" id="format">
+        <option>MP4</option>
+        <option>MKV</option>
+        <option>AV1</option>
+    </select>
+    <select class="dropdown" id="quality">
+        <option>Best</option>
+        <option>2160p (4K)</option>
+        <option>1440p (2K)</option>
+        <option>1080p</option>
+        <option>720p</option>
+        <option>480p</option>
+    </select>
 
-        <div class="control-group">
-            <label for="quality">Quality:</label>
-            <select id="quality">
-                <option value="auto">Auto</option>
-                <option value="720p">720p</option>
-                <option value="1080p">1080p</option>
-                <option value="1440p">1440p (2K)</option>
-                <option value="2160p">2160p (4K)</option>
-            </select>
-        </div>
+</div>
 
-        <button id="download">Download</button>
-    </div>
 
-    <div id="progress-container">
-        <div id="progress-bar"></div>
-    </div>
+<div class="tabs">
+    <div class="tab active">All</div>
+    <div class="tab">Video</div>
+    <div class="tab">Audio</div>
+    <div class="tab">Playlists</div>
+    <div class="tab">Channels</div>
+    <div class="tab">Subscriptions</div>
+</div>
 
-    <pre id="log"></pre>
+<div class="video-list" id="videoList">
+
+</div>
+
+<div class="bottom-bar">
+    <span>by Thai Trung</span>
 </div>
 
 <script src="renderer.js"></script>
