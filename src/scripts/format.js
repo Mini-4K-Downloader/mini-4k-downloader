@@ -6,9 +6,6 @@ function getFormatArgs(format) {
     else if (format === 'mkv') {
         args.push('--merge-output-format', 'mkv');
     }
-    else if (format === 'mp3') {
-        args.push('--extract-audio', '--audio-format', 'mp3');
-    }
     return args;
 }
 

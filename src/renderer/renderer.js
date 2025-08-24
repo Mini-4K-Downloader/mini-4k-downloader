@@ -27,26 +27,27 @@ function addVideoItem(thumbnailUrl, title, format, quality) {
     list.appendChild(item);
 }
 
-document.getElementById('addLinkBtn').addEventListener('click', () => {
+document.getElementById('addLinkBtn').addEventListener('click', async () => {
     const urlInput = document.getElementById('videoURL');
     const videoFormat = document.getElementById('format');
     const videoQuality = document.getElementById('quality');
+    const videoType = document.getElementById('type');
+    // const { getVideoInfo} = require('../main/videoInfo');
     const videoURL = urlInput.value.trim();
     if (!videoURL) return;
 
-    window.electronAPI.downloadVideo(videoURL);
+    const { title, thumbnail } = await window.electronAPI.getVideoInfo(videoURL);
 
-    let thumbnail = 'https://via.placeholder.com/120x90.png?text=No+Image';
-    let title = videoURL;
-    if (videoURL.includes('youtube.com/watch?v=')) {
-        const id = videoURL.split('v=')[1].split('&')[0];
-        thumbnail = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-        title = `YouTube Video (${id})`;
-    } else if (videoURL.includes('youtu.be/')) {
-        const id = videoURL.split('youtu.be/')[1].split('?')[0];
-        thumbnail = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-        title = `YouTube Video (${id})`;
-    }
+    window.electronAPI.downloadVideo({
+        url: videoURL,
+        type: videoType.value,
+        format: videoFormat.value,
+        quality: videoQuality.value,
+    });
+
+
+    // let thumbnail = 'https://i.ytimg.com/vi/OjP_asnAXt4/sddefault.jpg?sqp=-oaymwEmCIAFEOAD8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGHIgTCgxMA8=&rs=AOn4CLCJ9HhxKAJux2BDZfyeepjPp5N7hw';
+    // let title = 'hello 123';
 
     const format = videoFormat.value;
     const quality = videoQuality.value;

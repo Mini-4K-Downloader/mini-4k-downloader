@@ -5,6 +5,9 @@ const isDev = !app.isPackaged
 const { getFormatArgs } = require('../scripts/format')
 const { initAutoUpdater } = require('./updater');
 const { getQualityArgs } = require('../scripts/quality')
+const { getTypeArgs } = require('../scripts/type')
+const { getVideoInfo} = require("./videoInfo");
+const fs = require('fs');
 
 let mainWindow
 
@@ -38,12 +41,24 @@ app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
-ipcMain.handle('download-video', async (event, { url, format, quality }) => {
-    const savePaths = dialog.showOpenDialogSync({ properties: ['openDirectory'] })
-    if (!savePaths || savePaths.length === 0) return '❌ Canceled'
-    const savePath = savePaths[0]
+console.log("✅ Registering get-video-info handler");
+ipcMain.handle('get-video-info', async (event, url) => {
+    return await getVideoInfo(url)
+})
 
-    let ytdlpPath
+
+ipcMain.handle('download-video', async (event, { url, format, quality, type }) => {
+    let basePath;
+    if (process.platform === 'darwin') {
+        basePath = path.join(app.getPath("home"), "Movies");
+    }
+
+    const savePath = path.join(basePath, "Mini 4K Downloader");
+    if (!fs.existsSync(savePath)) {
+        fs.mkdirSync(savePath, { recursive: true });
+    }
+
+    let ytdlpPath;
     if (process.platform === 'win32') {
         ytdlpPath = isDev
             ? path.join(__dirname, '../../bin/yt-dlp.exe')
@@ -58,7 +73,7 @@ ipcMain.handle('download-video', async (event, { url, format, quality }) => {
             : path.join(process.resourcesPath, 'bin/yt-dlp_linux')
     }
 
-    let ffmpegPath
+    let ffmpegPath;
     if (process.platform === 'win32') {
         ffmpegPath = isDev
             ? path.join(__dirname, '../../bin/ffmpeg_win.exe')
@@ -75,11 +90,12 @@ ipcMain.handle('download-video', async (event, { url, format, quality }) => {
 
     const args = ['--newline', '-o', `${savePath}/%(title)s.%(ext)s`]
 
+    args.push(...getTypeArgs(type))
     args.push(...getFormatArgs(format))
     args.push(...getQualityArgs(quality))
 
     args.push('--ffmpeg-location', ffmpegPath)
-
+    args.push('--no-playlist');
     args.push(url)
 
     console.log('Yt-dlp args:', args)
