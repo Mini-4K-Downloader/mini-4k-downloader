@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, shell} = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 const isDev = !app.isPackaged
@@ -8,6 +8,7 @@ const { getQualityArgs } = require('../scripts/quality')
 const { getTypeArgs } = require('../scripts/type')
 const { getVideoInfo} = require("./videoInfo");
 const fs = require('fs');
+const url = require("node:url");
 
 let mainWindow
 
@@ -46,6 +47,24 @@ ipcMain.handle('get-video-info', async (event, url) => {
     return await getVideoInfo(url)
 })
 
+ipcMain.handle('show-in-folder', (event, filePath) => {
+    if (filePath) {
+        shell.showItemInFolder(filePath);
+    }
+})
+
+ipcMain.handle('open-in-browser', async (event, url) => {
+    await shell.openExternal(url);
+})
+
+ipcMain.handle('get-save-path', () => {
+    let basePath;
+    if (process.platform === 'darwin') {
+        basePath = path.join(app.getPath("home"), "Movies");
+    }
+    const savePath = path.join(basePath, 'Mini 4K Downloader');
+    return savePath;
+});
 
 ipcMain.handle('download-video', async (event, { url, format, quality, type }) => {
     let basePath;
@@ -100,11 +119,14 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
 
     console.log('Yt-dlp args:', args)
 
+    console.log('Save Path:', savePath)
+
     return new Promise((resolve, reject) => {
         const proc = spawn(ytdlpPath, args)
 
         proc.stdout.on('data', (data) => {
             const line = data.toString()
+            console.error("yt-dlp stderr:", line)
             event.sender.send('download-progress', line)
         })
 
@@ -114,8 +136,14 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
         })
 
         proc.on('close', (code) => {
-            if (code === 0) resolve(`✅ Downloaded as ${format}`)
-            else reject(`❌ Failed with code ${code}`)
-        })
+            if (code === 0) {
+                resolve({ message: `✅ Downloaded as ${format}` })
+            }
+            else {
+                reject({ message: `❌ Failed with code ${code}` });
+            }
+
+        });
     })
+
 })
