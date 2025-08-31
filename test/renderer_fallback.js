@@ -207,7 +207,7 @@ document.querySelector('.addLinkBtn').addEventListener('click', async () => {
                 await window.electronAPI.addSavedVideo(videoData);
             }
         } catch (err) {
-            console.error("Can't find video url infooo!", err);
+            console.error("Can't find video url info!", err);
         }
 
         window.electronAPI.downloadVideo({

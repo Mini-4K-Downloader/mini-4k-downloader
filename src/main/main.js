@@ -9,13 +9,40 @@ const { getTypeArgs } = require('../scripts/type')
 const { getVideoInfo} = require("./videoInfo");
 const fs = require('fs');
 const url = require("node:url");
+const { clipboard } = require("electron");
+const Store = require("electron-store");
+const store = new Store();
 
 let mainWindow
+let currentDownloadProcess = null
+
+function saveVideoMetadata(video) {
+    try {
+        let videos = store.get('videos', []);
+        const existingIndex = videos.findIndex(v => v.url === video.url);
+
+        if (existingIndex !== -1) {
+            videos[existingIndex] = { ...videos[existingIndex], ...video };
+        } else {
+            videos.push(video);
+        }
+
+        store.set('videos', videos);
+        return true;
+    } catch (error) {
+        console.error('Error saving video metadata:', error);
+        return false;
+    }
+}
+
+function getSavedVideo() {
+    return store.get('videos', []);
+}
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1000,
+        height: 700,
         show: true,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -42,6 +69,10 @@ app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
+ipcMain.handle('get-clipboard', async (event) => {
+    return await clipboard.readText();
+})
+
 console.log("✅ Registering get-video-info handler");
 ipcMain.handle('get-video-info', async (event, url) => {
     return await getVideoInfo(url)
@@ -65,6 +96,42 @@ ipcMain.handle('get-save-path', () => {
     const savePath = path.join(basePath, 'Mini 4K Downloader');
     return savePath;
 });
+
+ipcMain.handle('remove-file', async (event, filePath) => {
+    try {
+        await fs.promises.unlink(filePath);
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+
+ipcMain.handle('get-saved-videos', () => getSavedVideo());
+
+ipcMain.handle('add-saved-video', (event, video) => saveVideoMetadata(video));
+
+ipcMain.handle('remove-saved-video', (event, videoUrl) => {
+    try {
+        let videos = store.get('videos', []);
+        const videoToRemove = videos.find(v => v.url === videoUrl);
+
+        if (videoToRemove && videoToRemove.filePath) {
+            if (fs.existsSync(videoToRemove.filePath)) {
+                fs.unlinkSync(videoToRemove.filePath);
+            }
+        }
+
+        videos = videos.filter(v => v.url !== videoUrl);
+        store.set('videos', videos);
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error removing video:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+
 
 ipcMain.handle('download-video', async (event, { url, format, quality, type }) => {
     let basePath;
@@ -121,29 +188,83 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
 
     console.log('Save Path:', savePath)
 
+    if (currentDownloadProcess) {
+        currentDownloadProcess.kill();
+    }
+
     return new Promise((resolve, reject) => {
         const proc = spawn(ytdlpPath, args)
+        currentDownloadProcess = proc;
+        let outputPath = '';
 
         proc.stdout.on('data', (data) => {
-            const line = data.toString()
-            console.error("yt-dlp stderr:", line)
-            event.sender.send('download-progress', line)
-        })
+            const lines = data.toString().split('\n');
 
-        proc.stderr.on('data', (data) => {
-            const line = data.toString()
-            event.sender.send('download-progress', line)
-        })
+            lines.forEach(line => {
+                if (line.trim() === '') return;
 
-        proc.on('close', (code) => {
+                console.log('yt-dlp output:', line);
+
+                if (line.includes('[download]') &&
+                    (line.includes('%') || line.includes('ETA'))) {
+
+                    const progressMatch = line.match(/\[download\]\s+([\d.]+)%/);
+                    const etaMatch = line.match(/ETA\s+([\d:]+)/);
+                    const speedMatch = line.match(/\s+at\s+([\d.\w\/s]+)/);
+
+                    const progressData = {
+                        raw: line.trim(),
+                        percent: progressMatch ? parseFloat(progressMatch[1]) : null,
+                        eta: etaMatch ? etaMatch[1] : null,
+                        speed: speedMatch ? speedMatch[1] : null
+                    };
+
+                    event.sender.send('download-progress', progressData);
+                }
+
+                if (line.includes('[download] Destination:')) {
+                    outputPath = line.split('[download] Destination:')[1].trim();
+                } else if (line.includes('[Merger] Merging formats into "')) {
+                    outputPath = line.split('[Merger] Merging formats into "')[1].split('"')[0];
+                }
+            });
+        });
+
+        proc.on('close', async (code) => {
+            currentDownloadProcess = null;
             if (code === 0) {
-                resolve({ message: `✅ Downloaded as ${format}` })
-            }
-            else {
+                const videoData = {
+                    url: url,
+                    format: format,
+                    quality: quality,
+                    type: type,
+                    filePath: outputPath,
+                    downloadedAt: new Date().toISOString()
+                };
+
+                await saveVideoMetadata(videoData);
+                resolve({ message: `✅ Downloaded as ${format}`, filePath: outputPath });
+            } else {
                 reject({ message: `❌ Failed with code ${code}` });
             }
-
         });
-    })
 
-})
+        proc.on('error', (err) => {
+            currentDownloadProcess = null;
+            if (err.code === 'EPERM') {
+                reject({ message: '❌ Permission denied. Please check file permissions.' });
+            }
+            else {
+                reject({ message: err.message });
+            }
+        })
+    });
+});
+
+ipcMain.on('abort-download', () => {
+    if (currentDownloadProcess) {
+        currentDownloadProcess.kill('SIGTERM');
+        currentDownloadProcess = null;
+        console.log('Download aborted by user');
+    }
+});

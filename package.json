@@ -35,6 +35,8 @@
     "electron-builder": "^26.0.12"
   },
   "dependencies": {
+    "clipboardy": "^4.0.0",
+    "electron-store": "^8.2.0",
     "electron-updater": "^6.6.2"
   }
 }
