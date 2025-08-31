@@ -139,7 +139,8 @@ function showProgress(item, progressData) {
 
     if (progressData.percent !== null) {
         progressFill.style.width = `${progressData.percent}%`;
-        progressText.innerText = `${progressData.percent.toFixed(1)}% • ${progressData.speed || ''} • ETA: ${progressData.eta || ''}`;
+        // progressText.innerText = `${progressData.percent.toFixed(1)}% • ${progressData.speed || ''} • ETA: ${progressData.eta || ''}`;
+        progressText.innerText = `${progressData.percent.toFixed(1)}%`;
     } else {
         progressText.innerText = progressData.raw;
     }
