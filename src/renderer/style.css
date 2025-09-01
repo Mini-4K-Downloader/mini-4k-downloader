@@ -33,6 +33,10 @@ body {
     font-weight: bold;
 }
 
+.addLinkBtn:hover {
+    background-color: #2d4487;
+}
+
 .dropdown {
     background-color: #2a2a2a;
     color: #ddd;
@@ -82,8 +86,8 @@ body {
 }
 
 .thumbnail {
-    max-width: 140px;
-    max-height:100px;
+    max-width: 70px;
+    max-height:50px;
     border-radius: 4px;
     margin-right: 15px;
     overflow: hidden;

@@ -1,6 +1,6 @@
 {
   "name": "mini-4k-downloader",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "A simple Electron video downloader with yt-dlp",
   "main": "src/main/main.js",
   "scripts": {
@@ -12,13 +12,16 @@
     "appId": "com.shouko.mini4kdownloader",
     "productName": "Mini 4K Downloader",
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "assets/icons/icon.icns"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/icons/icon.ico"
     },
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "icon": "assets/icons"
     },
     "extraResources": [
       {
