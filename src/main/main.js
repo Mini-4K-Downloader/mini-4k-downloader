@@ -93,6 +93,9 @@ ipcMain.handle('get-save-path', () => {
     if (process.platform === 'darwin') {
         basePath = path.join(app.getPath("home"), "Movies");
     }
+    else if (process.platform === 'win32') {
+        basePath = app.getPath("videos");
+    }
     const savePath = path.join(basePath, 'Mini 4K Downloader');
     return savePath;
 });
