@@ -180,7 +180,7 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
             : path.join(process.resourcesPath, 'bin/ffmpeg_linux')
     }
 
-    const args = ['--newline', '-o', `${savePath}/%(title)s.%(ext)s`]
+    const args = ['--newline', '-o', `"${savePath}/%(title)s.%(ext)s"`];
 
     args.push(...getTypeArgs(type))
     args.push(...getFormatArgs(format))
