@@ -57,6 +57,7 @@ body {
     top: 60px;
     left: 0;
     right: 0;
+    padding: 5px 15px;
     z-index: 99;
     display: flex;
     border-bottom: 1px solid #2a2c2f;
@@ -66,11 +67,16 @@ body {
 .tab {
     padding: 10px 15px;
     cursor: pointer;
-    color: #aaa;
+    color: #7a7a7a;
+}
+
+.tab:hover {
+    color: #ffffff;
+    background-color: #2a2c2f;
 }
 
 .tab.active {
-    color: #1e3a8a;
+    color: #ffffff;
     border-bottom: 2px solid #1e3a8a;
 }
 

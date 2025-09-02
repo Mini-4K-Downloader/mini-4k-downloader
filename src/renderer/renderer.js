@@ -1,11 +1,12 @@
 let currentDownloadVideoItem = null;
 
-function addVideoItem(thumbnailUrl, title, format, quality, url) {
+function addVideoItem(thumbnailUrl, title, format, quality, url, type = 'video') {
     const list = document.getElementById('videoList');
     const item = document.createElement('div');
     item.style.position = 'relative';
     item.className = 'video-item';
     item.dataset.url = url;
+    item.dataset.type = type.toLowerCase();
 
     const menuBtn = document.createElement('button');
     menuBtn.className = 'menu-btn';
@@ -32,7 +33,6 @@ function addVideoItem(thumbnailUrl, title, format, quality, url) {
         item.remove();
         await window.electronAPI.removeSavedVideo(url);
     });
-
 
     menu.querySelector('.show-finder').addEventListener('click', async () => {
         const savedVideos = await window.electronAPI.getSavedVideos();
@@ -75,8 +75,7 @@ function addVideoItem(thumbnailUrl, title, format, quality, url) {
 
     const metaDiv = document.createElement('div');
     metaDiv.className = 'video-meta';
-    // metaDiv.innerText = `Format: ${format}, Quality: ${quality}`;
-    metaDiv.innerText = `${format} · ${quality}`
+    metaDiv.innerText = `${format} · ${quality}`;
 
     const progressContainer = document.createElement('div');
     progressContainer.className = 'progress-container';
@@ -124,7 +123,6 @@ function addVideoItem(thumbnailUrl, title, format, quality, url) {
         }
     });
 
-
     return {
         element: item,
         showProgress: (progressData) => showProgress(item, progressData),
@@ -147,7 +145,6 @@ function showProgress(item, progressData) {
 
     if (progressData.percent !== null) {
         progressFill.style.width = `${progressData.percent}%`;
-        // progressText.innerText = `${progressData.percent.toFixed(1)}% • ${progressData.speed || ''} • ETA: ${progressData.eta || ''}`;
         progressText.innerText = `${progressData.percent.toFixed(1)}%`;
     } else {
         progressText.innerText = progressData.raw;
@@ -165,7 +162,7 @@ function hideProgress(item) {
 window.addEventListener('DOMContentLoaded', async () => {
     const savedVideos = await window.electronAPI.getSavedVideos();
     savedVideos.forEach(video => {
-        addVideoItem(video.thumbnail, video.title, video.format, video.quality, video.url);
+        addVideoItem(video.thumbnail, video.title, video.format, video.quality, video.url, video.type);
     });
 });
 
@@ -193,7 +190,7 @@ document.querySelector('.addLinkBtn').addEventListener('click', async () => {
         const format = videoFormat.value;
         const quality = videoQuality.value;
 
-        const videoItem = addVideoItem(thumbnail, title, format, quality, videoURL);
+        const videoItem = addVideoItem(thumbnail, title, format, quality, videoURL, videoType.value);
         const item = videoItem.element;
         videoItem.showAbortButton();
 
@@ -211,12 +208,13 @@ document.querySelector('.addLinkBtn').addEventListener('click', async () => {
                     title: realTitle || title,
                     format,
                     quality,
-                    url: videoURL
+                    url: videoURL,
+                    type: videoType.value
                 };
                 await window.electronAPI.addSavedVideo(videoData);
             }
         } catch (err) {
-            console.error("Can't find video url infooo!", err);
+            console.error("Can't find video infoooo!", err);
         }
 
         window.electronAPI.downloadVideo({
@@ -240,4 +238,24 @@ document.querySelector('.addLinkBtn').addEventListener('click', async () => {
         console.error('Error processing clipboard:', error);
         alert('Error: Could not read from clipboard');
     }
+});
+
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        const filter = tab.textContent.trim().toLowerCase();
+        const videos = document.querySelectorAll(".video-item");
+
+        videos.forEach(v => {
+            if (filter === "all") {
+                v.style.display = "flex";
+            } else if (filter === "playlists") {
+                v.style.display = (v.dataset.type === "playlist") ? "flex" : "none";
+            } else {
+                v.style.display = (v.dataset.type === filter) ? "flex" : "none";
+            }
+        });
+    });
 });
