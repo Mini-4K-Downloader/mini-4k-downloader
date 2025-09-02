@@ -163,23 +163,23 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
             : path.join(process.resourcesPath, 'bin/ffmpeg_linux')
     }
 
-    let aria2c;
-    if (process.platform === 'win32') {
-        aria2c = isDev
-            ? path.join(__dirname, '../../bin/aria2c.exe')
-            : path.join(process.resourcesPath, 'aria2c.exe')
-    }
+    // let aria2c;
+    // if (process.platform === 'win32') {
+    //     aria2c = isDev
+    //         ? path.join(__dirname, '../../bin/aria2c.exe')
+    //         : path.join(process.resourcesPath, 'aria2c.exe')
+    // }
 
     const args = ['--newline', '-o', filePath]
 
-    args.push('--hls-prefer-ffmpeg');
+    // args.push('--hls-prefer-ffmpeg');
 
     args.push(...getTypeArgs(type))
     args.push(...getFormatArgs(format))
     args.push(...getQualityArgs(quality))
 
-    args.push('--external-downloader', aria2c)
-    args.push('--external-downloader-args', '-x 16 -k 1M')
+    // args.push('--external-downloader', aria2c)
+    // args.push('--external-downloader-args', '-x 16 -k 1M')
 
     args.push('--ffmpeg-location', ffmpegPath)
     args.push('--no-playlist')
