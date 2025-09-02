@@ -29,7 +29,7 @@ and download media from YouTube and many other supported platforms.
 
 ---
 
-### Running Mini 4K Downloader on Different Platforms
+### ⚠️ Running Mini 4K Downloader on Different Platforms
 
 - **macOS:**  
   This app is not yet notarized by Apple. If you see a warning like "unidentified developer," you can bypass it by:
