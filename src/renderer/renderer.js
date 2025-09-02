@@ -117,6 +117,7 @@ function addVideoItem(thumbnailUrl, title, format, quality, url) {
         }
     });
 
+
     return {
         element: item,
         showProgress: (progressData) => showProgress(item, progressData),
