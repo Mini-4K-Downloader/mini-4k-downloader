@@ -227,11 +227,6 @@ body {
     display: none;
     align-items: center;
     gap: 10px;
-    margin-top: 10px;
-    padding: 8px;
-    background: #333;
-    border-radius: 6px;
-    width: 100%;
 }
 
 .progress-bar {
@@ -253,7 +248,7 @@ body {
 .progress-text {
     font-size: 12px;
     color: #ccc;
-    min-width: 120px;
+    min-width: 10px;
     font-family: monospace;
 }
 
