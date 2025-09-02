@@ -69,7 +69,8 @@ function addVideoItem(thumbnailUrl, title, format, quality, url) {
 
     const metaDiv = document.createElement('div');
     metaDiv.className = 'video-meta';
-    metaDiv.innerText = `Format: ${format}, Quality: ${quality}`;
+    // metaDiv.innerText = `Format: ${format}, Quality: ${quality}`;
+    metaDiv.innerText = `${format} · ${quality}`
 
     const progressContainer = document.createElement('div');
     progressContainer.className = 'progress-container';
