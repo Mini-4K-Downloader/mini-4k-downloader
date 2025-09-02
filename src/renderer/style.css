@@ -16,11 +16,17 @@ body {
 }
 
 .controls {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
     display: flex;
     align-items: center;
     gap: 10px;
     background-color: #191b1e;
     padding: 10px 15px;
+    border-bottom: 1px solid #2a2c2f;
 }
 
 .addLinkBtn {
@@ -47,6 +53,11 @@ body {
 }
 
 .tabs {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 99;
     display: flex;
     border-bottom: 1px solid #2a2c2f;
     background-color: #181818;
@@ -65,6 +76,8 @@ body {
 
 .video-list {
     padding: 20px;
+    margin-top: 100px;
+    margin-bottom: 50px;
 }
 
 .video-item {
@@ -170,34 +183,36 @@ body {
     font-size: 18px;
     cursor: pointer;
     color: white;
-    z-index: 2;
 }
 
 .video-menu {
     position: absolute;
     top: 30px;
     right: 5px;
+    z-index: 9999;
     background: #222;
     border-radius: 8px;
     padding: 5px 0;
     display: none;
     flex-direction: column;
     min-width: 150px;
-    z-index: 10;
 }
 
 .video-menu.show {
     display: flex;
+    z-index: 9999;
 }
 
 .video-menu .menu-item {
     padding: 8px 12px;
     cursor: pointer;
     color: #fff;
+    z-index: 100;
 }
 
 .video-menu .menu-item:hover {
     background: #444;
+    z-index: 100;
 }
 .progress-container {
     display: none;

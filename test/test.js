@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, shell, clipboard } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, shell} = require('electron')
 const path = require('path')
 const { spawn } = require('child_process')
 const isDev = !app.isPackaged
@@ -6,8 +6,10 @@ const { getFormatArgs } = require('../scripts/format')
 const { initAutoUpdater } = require('./updater');
 const { getQualityArgs } = require('../scripts/quality')
 const { getTypeArgs } = require('../scripts/type')
-const { getVideoInfo } = require("./videoInfo");
+const { getVideoInfo} = require("./videoInfo");
 const fs = require('fs');
+const url = require("node:url");
+const { clipboard } = require("electron");
 const Store = require("electron-store");
 const store = new Store();
 
@@ -67,25 +69,36 @@ app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
-ipcMain.handle('get-clipboard', async () => {
+ipcMain.handle('get-clipboard', async (event) => {
     return await clipboard.readText();
 })
 
+console.log("✅ Registering get-video-info handler");
 ipcMain.handle('get-video-info', async (event, url) => {
     return await getVideoInfo(url)
 })
 
-ipcMain.handle('show-in-folder', async (event, filePath) => {
-    if (fs.existsSync(filePath)) {
-        shell.showItemInFolder(filePath)
-        return true
+ipcMain.handle('show-in-folder', (event, filePath) => {
+    if (filePath) {
+        shell.showItemInFolder(filePath);
     }
-    return false
 })
 
 ipcMain.handle('open-in-browser', async (event, url) => {
     await shell.openExternal(url);
 })
+
+ipcMain.handle('get-save-path', () => {
+    let basePath;
+    if (process.platform === 'darwin') {
+        basePath = path.join(app.getPath("home"), "Movies");
+    }
+    else if (process.platform === 'win32') {
+        basePath = app.getPath("videos");
+    }
+    const savePath = path.join(basePath, 'Mini 4K Downloader');
+    return savePath;
+});
 
 ipcMain.handle('remove-file', async (event, filePath) => {
     try {
@@ -121,17 +134,14 @@ ipcMain.handle('remove-saved-video', (event, videoUrl) => {
     }
 });
 
-ipcMain.handle('download-video', async (event, { url, format, quality, type }) => {
-    // Hiển thị hộp thoại Save As
-    const { canceled, filePath } = await dialog.showSaveDialog({
-        title: "Choose where to save the video",
-        defaultPath: path.join(app.getPath("downloads"), "%(title)s.%(ext)s"),
-        filters: [{ name: format.toUpperCase(), extensions: [format] }]
-    });
 
-    if (canceled || !filePath) {
-        return { message: '❌ Canceled' };
+
+ipcMain.handle('download-video', async (event, { url, format, quality, type }) => {
+    const filePaths = dialog.showSaveDialog({ properties: ['openDirectory'] })
+    if (!filePaths || filePaths.length === 0) {
+        return '❌ Canceled'
     }
+    const filePath = filePaths[0];
 
     let ytdlpPath;
     if (process.platform === 'win32') {
@@ -163,7 +173,7 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
             : path.join(process.resourcesPath, 'bin/ffmpeg_linux')
     }
 
-    const args = ['--newline', '-o', filePath]
+    const args = ['--newline', '-o', `"${savePath}/%(title)s.%(ext)s"`];
 
     args.push(...getTypeArgs(type))
     args.push(...getFormatArgs(format))
@@ -174,7 +184,8 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
     args.push(url)
 
     console.log('Yt-dlp args:', args)
-    console.log('Save Path:', filePath)
+
+    console.log('Save Path:', savePath)
 
     if (currentDownloadProcess) {
         currentDownloadProcess.kill();
@@ -183,7 +194,7 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
     return new Promise((resolve, reject) => {
         const proc = spawn(ytdlpPath, args)
         currentDownloadProcess = proc;
-        let outputPath = filePath;
+        let outputPath = '';
 
         proc.stdout.on('data', (data) => {
             const lines = data.toString().split('\n');
