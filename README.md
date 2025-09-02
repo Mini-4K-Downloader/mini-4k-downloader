@@ -1,5 +1,15 @@
 # Mini 4K Downloader
 
+
+<div align="center">
+
+[![Electron](https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white)](https://www.electronjs.org/)  
+[![yt-dlp](https://img.shields.io/badge/yt--dlp-FFB000?style=for-the-badge&logo=youtube&logoColor=white)](https://github.com/yt-dlp/yt-dlp)  
+[![FFmpeg](https://img.shields.io/badge/ffmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white)](https://ffmpeg.org/)  
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
+
+</div>
+
 **Mini 4K Downloader** is a desktop application built with [Electron](https://www.electronjs.org/).  
 It was inspired by the idea of [4K Video Downloader](https://www.4kdownload.com/products/videodownloader), kinda like a
 **knock-off** version.
