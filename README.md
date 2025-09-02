@@ -2,11 +2,18 @@
 
 
 <div align="center">
-
-[![Electron](https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white)](https://www.electronjs.org/)  
-[![yt-dlp](https://img.shields.io/badge/yt--dlp-FFB000?style=for-the-badge&logo=youtube&logoColor=white)](https://github.com/yt-dlp/yt-dlp)  
-[![FFmpeg](https://img.shields.io/badge/ffmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white)](https://ffmpeg.org/)  
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
+    <a href="https://www.electronjs.org/">
+        <img src="https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white" alt="Electron"/>
+    </a>
+    <a href="https://github.com/yt-dlp/yt-dlp">
+        <img src="https://img.shields.io/badge/yt--dlp-FFB000?style=for-the-badge&logo=youtube&logoColor=white" alt="yt-dlp"/>
+    </a>
+    <a href="https://ffmpeg.org/">
+        <img src="https://img.shields.io/badge/ffmpeg-007808?style=for-the-badge&logo=ffmpeg&logoColor=white" alt="ffmpeg"/>
+    </a>
+    <a href="https://www.gnu.org/licenses/gpl-3.0">
+        <img src="https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge" alt="gpl-3.0"/>
+    </a>
 
 </div>
 
