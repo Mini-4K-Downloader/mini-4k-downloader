@@ -8,6 +8,7 @@ const { getQualityArgs } = require('../scripts/quality')
 const { getTypeArgs } = require('../scripts/type')
 const { getVideoInfo } = require("./videoInfo");
 const fs = require('fs');
+const { getYtDlpPath, getFfmpegPath } = require("../scripts/paths");
 const Store = require("electron-store");
 const store = new Store();
 
@@ -45,7 +46,8 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
-            contextIsolation: true
+            contextIsolation: true,
+            webSecurity: false
         }
     })
 
@@ -122,9 +124,8 @@ ipcMain.handle('remove-saved-video', (event, videoUrl) => {
 });
 
 ipcMain.handle('download-video', async (event, { url, format, quality, type }) => {
-    // Hiển thị hộp thoại Save As
     const { canceled, filePath } = await dialog.showSaveDialog({
-        title: "Choose where to save the video",
+        title: "Save to ..",
         defaultPath: path.join(app.getPath("downloads"), "%(title)s.%(ext)s"),
         filters: [{ name: format.toUpperCase(), extensions: [format] }]
     });
@@ -133,35 +134,8 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
         return { message: '❌ Canceled' };
     }
 
-    let ytdlpPath;
-    if (process.platform === 'win32') {
-        ytdlpPath = isDev
-            ? path.join(__dirname, '../../bin/yt-dlp.exe')
-            : path.join(process.resourcesPath, 'bin/yt-dlp.exe')
-    } else if (process.platform === 'darwin') {
-        ytdlpPath = isDev
-            ? path.join(__dirname, '../../bin/yt-dlp_macos')
-            : path.join(process.resourcesPath, 'bin/yt-dlp_macos')
-    } else {
-        ytdlpPath = isDev
-            ? path.join(__dirname, '../../bin/yt-dlp_linux')
-            : path.join(process.resourcesPath, 'bin/yt-dlp_linux')
-    }
-
-    let ffmpegPath;
-    if (process.platform === 'win32') {
-        ffmpegPath = isDev
-            ? path.join(__dirname, '../../bin/ffmpeg_win.exe')
-            : path.join(process.resourcesPath, 'bin/ffmpeg_win.exe')
-    } else if (process.platform === 'darwin') {
-        ffmpegPath = isDev
-            ? path.join(__dirname, '../../bin/ffmpeg_macos')
-            : path.join(process.resourcesPath, 'bin/ffmpeg_macos')
-    } else {
-        ffmpegPath = isDev
-            ? path.join(__dirname, '../../bin/ffmpeg_linux')
-            : path.join(process.resourcesPath, 'bin/ffmpeg_linux')
-    }
+    const ytdlpPath = getYtDlpPath();
+    const ffmpegPath = getFfmpegPath();
 
     // let aria2c;
     // if (process.platform === 'win32') {

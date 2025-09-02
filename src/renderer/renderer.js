@@ -201,8 +201,14 @@ document.querySelector('.addLinkBtn').addEventListener('click', async () => {
             if (realTitle || realThumb) {
                 const img = item.querySelector('img.thumbnail');
                 const titleDiv = item.querySelector('.video-title');
-                if (img && realThumb) img.src = realThumb;
-                if (titleDiv && realTitle) titleDiv.innerText = realTitle;
+                if (img && realThumb) {
+                    console.log('Thumbnail Logs:', realThumb);
+                    img.src = realThumb;
+                }
+                if (titleDiv && realTitle) {
+                    console.log('Title Logs:', realThumb);
+                    titleDiv.innerText = realTitle;
+                }
                 const videoData = {
                     thumbnail: realThumb || thumbnail,
                     title: realTitle || title,
