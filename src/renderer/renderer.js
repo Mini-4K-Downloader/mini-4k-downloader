@@ -33,18 +33,24 @@ function addVideoItem(thumbnailUrl, title, format, quality, url) {
         await window.electronAPI.removeSavedVideo(url);
     });
 
+
     menu.querySelector('.show-finder').addEventListener('click', async () => {
-        const savePath = await window.electronAPI.getSavePath();
-        const videoPath = `${savePath}/${titleDiv.innerText}.${format}`;
-        window.electronAPI.showInFolder(videoPath);
+        const savedVideos = await window.electronAPI.getSavedVideos();
+        const videoData = savedVideos.find(v => v.url === url);
+        if (videoData && videoData.filePath) {
+            window.electronAPI.showInFolder(videoData.filePath);
+        }
     });
 
     menu.querySelector('.delete-file').addEventListener('click', async () => {
-        const savePath = await window.electronAPI.getSavePath();
-        const videoPath = `${savePath}/${titleDiv.innerText}.${format}`;
-        await window.electronAPI.removeFile(videoPath);
-        item.remove();
-        await window.electronAPI.removeSavedVideo(url);
+        const savedVideos = await window.electronAPI.getSavedVideos();
+        const videoData = savedVideos.find(v => v.url === url);
+
+        if (videoData && videoData.filePath) {
+            await window.electronAPI.removeFile(videoData.filePath);
+            item.remove();
+            await window.electronAPI.removeSavedVideo(url);
+        }
     });
 
     menu.querySelector('.copy-link').addEventListener('click', () => {
@@ -107,7 +113,7 @@ function addVideoItem(thumbnailUrl, title, format, quality, url) {
     item.appendChild(img);
     item.appendChild(infoDiv);
 
-    list.appendChild(item);
+    list.prepend(item);
 
     abortBtn.addEventListener('click', (e) => {
         e.stopPropagation();
