@@ -35,4 +35,11 @@ function getFfmpegPath() {
     }
 }
 
-module.exports = { getYtDlpPath, getFfmpegPath };
+function getAria2cPath() {
+    if (process.platform === 'darwin') {
+        return isDev
+            ? path.join(__dirname, '../../bin/aria2c')
+            : path.join(process.resourcesPath, "bin/aria2c");
+    }
+}
+module.exports = { getYtDlpPath, getFfmpegPath, getAria2cPath };

@@ -8,7 +8,7 @@ const { getQualityArgs } = require('../scripts/quality')
 const { getTypeArgs } = require('../scripts/type')
 const { getVideoInfo } = require("./videoInfo");
 const fs = require('fs');
-const { getYtDlpPath, getFfmpegPath } = require("../scripts/paths");
+const { getYtDlpPath, getFfmpegPath, getAria2cPath} = require("../scripts/paths");
 const Store = require("electron-store");
 const store = new Store();
 
@@ -136,13 +136,7 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
 
     const ytdlpPath = getYtDlpPath();
     const ffmpegPath = getFfmpegPath();
-
-    // let aria2c;
-    // if (process.platform === 'win32') {
-    //     aria2c = isDev
-    //         ? path.join(__dirname, '../../bin/aria2c.exe')
-    //         : path.join(process.resourcesPath, 'aria2c.exe')
-    // }
+    const aria2cPath = getAria2cPath();
 
     const args = ['--newline', '-o', filePath]
 
@@ -152,7 +146,7 @@ ipcMain.handle('download-video', async (event, { url, format, quality, type }) =
     args.push(...getFormatArgs(format))
     args.push(...getQualityArgs(quality))
 
-    // args.push('--external-downloader', aria2c)
+    // args.push('--external-downloader', aria2cPath)
     // args.push('--external-downloader-args', '-x 16 -k 1M')
 
     args.push('--ffmpeg-location', ffmpegPath)
